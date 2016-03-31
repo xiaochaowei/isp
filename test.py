@@ -25,7 +25,7 @@ for row in reader:
 	if isp == "":
 		continue
 	if machineList.has_key(machine_id):
-		if machineList[machine_id].find(isp) != -1:
+		if isp in machineList[machine_id]:
 			continue	
 		else:
 			index = -1
