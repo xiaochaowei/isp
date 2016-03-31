@@ -9,7 +9,6 @@ INSERT_SQL = """ INSERT INTO machine2isp(machine_id, country,isp) values ({machi
 UPDATE_SQL = """UPDATE machine2isp set isp = {isp} where id = {id}; """ 
 fid = open("/home/xiaocw/data/machine_isp.csv",'r')
 print "load data"
-#data = fid.read()
 reader = csv.reader(fid,delimiter=",", quotechar="|")
 print "load success"
 machineList = {}
@@ -20,30 +19,44 @@ for row in reader:
 		flag = flag + 1
 		continue
 	flag = flag+ 1
-	#tmp = data_list[i].split(',')
 	machine_id = row[0]
 	isp = row[2]
 	country = row[1]
+	if isp == "":
+		continue
 	if machineList.has_key(machine_id):
 		if machineList[machine_id].find(isp) != -1:
 			continue	
-		else:	
-			for isp_sub in machineList[machine_id]:
-				common_len = lcs(isp, machineList[machine_id]）
-				if float(common_len) / max(len(isp), len(machineList[machine_id])) > eps:
-					if len(isp) < len(machineList[machine_id]):
-						comment_sql = UPDATE_SQL.format(id = id, isp = isp)
+		else:
+			index = -1
+			max_sim = -1
+			for isp_idx in range(0, len(machineList[machine_id])):
+				isp_sub = machineList[machine_id][isp_idx]
+				common_len = lcs(isp, isp_sub)
+				sim = float(common_len) / max(len(isp), len(isp_sub))
+				if sim > eps and max_sim < sim:
+					index = isp_idx
+					max_sim = sim
+			if index != -1:
+				#update
+				if len(isp) < len(machineList[machine_id][index]):
+					   	machineList[machine_id][index] = isp
+						comment_sql = UPDATE_SQL.format(id = id, isp = machineList[machineList][index])
 						cursor.execute(comment_sql)
-			else:i
+						conn.commit()
+				else:
+					continue
+			else:
+				machineList[machine_id].append(isp)
 				comment_sql = INSERT_SQL(machine_id = machine_id, country = country, isp = isp)
-				cursor.execute(comment_sql)	
-			print row
-			print "compare" 
-			print machineList[machine_id]
-		continue
+				cursor.execute(comment_sql)
+				conn.commit()
 	else:
 		machineList[machine_id] = []
-		machineList[machine_id].append(isp)	
+		machineList[machine_id].append(isp) 
+		comment_sql = INSERT_SQL(machine_id = machine_id, country = country, isp = isp)
+		cursor.execute(comment_sql)	
+		conn.commit()
 #for line in fid:
 #	tmp = line.split(',')
 #	if type(tmp[0]) == type(""):
