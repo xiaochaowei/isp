@@ -5,7 +5,6 @@ def lcs(s,t):
 	b = [[0 for i in range(0,len_t+1)] for j in range(0,len_s+1)]
 	for i in range(1, len_s+1):
 		for j in range(1, len_t+1):
-			print i,j
 			if s[i-1] == t[j-1]:
 				l[i][j] = l[i-1][j-1] + 1
 				b[i][j] = 3
@@ -16,8 +15,14 @@ def lcs(s,t):
 				else:
 					l[i][j] = l[i][j-1]
 					b[i][j] = 1
-	r = ""
-	r = findLCS(b,len_s,len_t,r,s)
+#	r = ""
+#
+
+
+
+
+
+#	r = findLCS(b,len_s,len_t,r,s)
 	return l[len_s][len_t]
 def findLCS(b,i,j,r,s):
 	if b[i][j] == 0:

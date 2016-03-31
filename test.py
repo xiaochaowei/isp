@@ -2,9 +2,9 @@ import sys
 import csv
 import MySQLdb
 import lcs
-#conn = MySQLdb.connect(user = "root", passwd = "19920930", db = "ISP")
+conn = MySQLdb.connect(user = "root", passwd = "19920930", db = "ISP")
 
-#cursor = conn.cursor()
+cursor = conn.cursor()
 INSERT_SQL = """ INSERT INTO machine2isp(machine_id, country,isp) values ({machine_id}, "{country}", "{isp}"); """
 UPDATE_SQL = """UPDATE machine2isp set isp = {isp} where id = {id}; """ 
 fid = open("/home/xiaocw/data/machine_isp.csv",'r')
@@ -48,13 +48,13 @@ for row in reader:
 					continue
 			else:
 				machineList[machine_id].append(isp)
-				comment_sql = INSERT_SQL(machine_id = machine_id, country = country, isp = isp)
+				comment_sql = INSERT_SQL.format(machine_id = machine_id, country = country, isp = isp)
 				cursor.execute(comment_sql)
 				conn.commit()
 	else:
 		machineList[machine_id] = []
 		machineList[machine_id].append(isp) 
-		comment_sql = INSERT_SQL(machine_id = machine_id, country = country, isp = isp)
+		comment_sql = INSERT_SQL.format(machine_id = machine_id, country = country, isp = isp)
 		cursor.execute(comment_sql)	
 		conn.commit()
 #for line in fid:
