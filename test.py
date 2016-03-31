@@ -6,7 +6,7 @@ conn = MySQLdb.connect(user = "root", passwd = "19920930", db = "ISP")
 
 cursor = conn.cursor()
 INSERT_SQL = """ INSERT INTO machine2isp(machine_id, country,isp) values ({machine_id}, "{country}", "{isp}"); """
-UPDATE_SQL = """UPDATE machine2isp set isp = {isp} where id = {id}; """ 
+UPDATE_SQL = """UPDATE machine2isp set isp = "{newisp}" where machine_id = {machine_id} and isp = "{isp}"; """ 
 fid = open("/home/xiaocw/data/machine_isp.csv",'r')
 print "load data"
 reader = csv.reader(fid,delimiter=",", quotechar="|")
@@ -18,6 +18,7 @@ for row in reader:
 	if flag == 1:
 		flag = flag + 1
 		continue
+	print flag
 	flag = flag+ 1
 	machine_id = row[0]
 	isp = row[2]
@@ -32,8 +33,10 @@ for row in reader:
 			max_sim = -1
 			for isp_idx in range(0, len(machineList[machine_id])):
 				isp_sub = machineList[machine_id][isp_idx]
-				common_len = lcs(isp, isp_sub)
+				common_len = lcs.lcs(isp, isp_sub)
 				sim = float(common_len) / max(len(isp), len(isp_sub))
+				#print sim
+				#print isp_sub, isp
 				if sim > eps and max_sim < sim:
 					index = isp_idx
 					max_sim = sim
@@ -41,7 +44,7 @@ for row in reader:
 				#update
 				if len(isp) < len(machineList[machine_id][index]):
 					   	machineList[machine_id][index] = isp
-						comment_sql = UPDATE_SQL.format(id = id, isp = machineList[machineList][index])
+						comment_sql = UPDATE_SQL.format(newisp = isp, machine_id = machine_id,  isp = machineList[machine_id][index])
 						cursor.execute(comment_sql)
 						conn.commit()
 				else:
